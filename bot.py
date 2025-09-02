@@ -18,7 +18,11 @@ except ImportError:
 WELCOME_MESSAGE = "Добро пожаловать! Следуйте инструкции и ожидайте ответа."
 
 async def welcome_new_member(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Отправляет приветственное сообщение новым участникам."""
+    """Отправляет приветственное сообщение новым участникам и логирует chat_id."""
+    # Логируем chat_id для любого события в канале
+    logger.info(f"Chat ID: {update.effective_chat.id}")
+    
+    # Проверяем ограничение по каналу, если CHANNEL_ID задан
     if CHANNEL_ID and update.effective_chat.id != CHANNEL_ID:
         return
     
