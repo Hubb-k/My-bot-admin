@@ -13,13 +13,13 @@ try:
 except ImportError:
     TOKEN = os.getenv("TOKEN")
     CHANNEL_ID = os.getenv("CHANNEL_ID")  # Оставляем как строку
-    logger.info(f"Loaded TOKEN: {TOKEN}, CHANNEL_ID: {CHANNEL_ID}")  # Логируем переменные
+    logger.info(f"Loaded TOKEN: {TOKEN}, CHANNEL_ID: {CHANNEL_ID}")  # Логируем для отладки
 
 # Приветственное сообщение
 WELCOME_MESSAGE = "Добро пожаловать! Следуйте инструкции и ожидайте ответа."
 
 async def welcome_new_member(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Отправляет приветственное сообщение новым участникам и логирует chat_id."""
+    """Отправляет приветственное сообщение новому участнику и логирует chat_id."""
     # Логируем полученное обновление
     logger.info(f"Received update: {update}")
     chat_id = str(update.effective_chat.id)  # Преобразуем в строку
@@ -30,19 +30,21 @@ async def welcome_new_member(update: Update, context: ContextTypes.DEFAULT_TYPE)
         logger.info(f"Игнорируем событие: chat_id {chat_id} не совпадает с CHANNEL_ID {CHANNEL_ID}")
         return
     
-    new_members = update.chat_member.new_chat_member
-    for member in new_members:
-        if member.is_bot:
-            continue
-        username = member.username or member.first_name
-        try:
-            await context.bot.send_message(
-                chat_id=update.effective_chat.id,
-                text=f"@{username} {WELCOME_MESSAGE}"
-            )
-            logger.info(f"Приветствие отправлено для {username}")
-        except Exception as e:
-            logger.error(f"Ошибка при отправке приветствия: {e}")
+    # Получаем нового участника (один объект)
+    new_member = update.chat_member.new_chat_member
+    if new_member.is_bot:
+        logger.info("Игнорируем бота")
+        return
+    
+    username = new_member.user.username or new_member.user.first_name
+    try:
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=f"@{username} {WELCOME_MESSAGE}"
+        )
+        logger.info(f"Приветствие отправлено для {username}")
+    except Exception as e:
+        logger.error(f"Ошибка при отправке приветствия: {e}")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Команда /start для тестирования бота."""
