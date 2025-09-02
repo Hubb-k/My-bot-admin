@@ -12,18 +12,22 @@ try:
     from config import TOKEN, CHANNEL_ID
 except ImportError:
     TOKEN = os.getenv("TOKEN")
-    CHANNEL_ID = int(os.getenv("CHANNEL_ID")) if os.getenv("CHANNEL_ID") else None
+    CHANNEL_ID = os.getenv("CHANNEL_ID")  # Оставляем как строку
+    logger.info(f"Loaded TOKEN: {TOKEN}, CHANNEL_ID: {CHANNEL_ID}")  # Логируем переменные
 
 # Приветственное сообщение
 WELCOME_MESSAGE = "Добро пожаловать! Следуйте инструкции и ожидайте ответа."
 
 async def welcome_new_member(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Отправляет приветственное сообщение новым участникам и логирует chat_id."""
-    # Логируем chat_id для любого события в канале
-    logger.info(f"Chat ID: {update.effective_chat.id}")
+    # Логируем полученное обновление
+    logger.info(f"Received update: {update}")
+    chat_id = str(update.effective_chat.id)  # Преобразуем в строку
+    logger.info(f"Chat ID: {chat_id}")
     
     # Проверяем ограничение по каналу, если CHANNEL_ID задан
-    if CHANNEL_ID and update.effective_chat.id != CHANNEL_ID:
+    if CHANNEL_ID and chat_id != CHANNEL_ID:
+        logger.info(f"Игнорируем событие: chat_id {chat_id} не совпадает с CHANNEL_ID {CHANNEL_ID}")
         return
     
     new_members = update.chat_member.new_chat_member
@@ -50,6 +54,7 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
 def main() -> None:
     """Запуск бота."""
+    logger.info("Бот запускается...")
     application = Application.builder().token(TOKEN).build()
     application.add_handler(ChatMemberHandler(welcome_new_member, ChatMemberHandler.CHAT_MEMBER))
     application.add_handler(CommandHandler("start", start))
