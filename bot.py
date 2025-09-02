@@ -13,7 +13,7 @@ try:
 except ImportError:
     TOKEN = os.getenv("TOKEN")
     CHANNEL_ID = os.getenv("CHANNEL_ID")  # Оставляем как строку
-    logger.info(f"Loaded TOKEN: {TOKEN}, CHANNEL_ID: {CHANNEL_ID}")  # Логируем для отладки
+    logger.info(f"Loaded TOKEN: {TOKEN}, CHANNEL_ID: {CHANNEL_ID}")
 
 # Приветственное сообщение
 WELCOME_MESSAGE = "Добро пожаловать! Следуйте инструкции и ожидайте ответа."
@@ -30,9 +30,9 @@ async def welcome_new_member(update: Update, context: ContextTypes.DEFAULT_TYPE)
         logger.info(f"Игнорируем событие: chat_id {chat_id} не совпадает с CHANNEL_ID {CHANNEL_ID}")
         return
     
-    # Получаем нового участника (один объект)
+    # Получаем нового участника
     new_member = update.chat_member.new_chat_member
-    if new_member.is_bot:
+    if new_member.user.is_bot:  # Проверяем is_bot через user
         logger.info("Игнорируем бота")
         return
     
