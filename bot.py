@@ -15,4 +15,4 @@ except ImportError:
     CHANNEL_ID = int(os.getenv("CHANNEL_ID")) if os.getenv("CHANNEL_ID") else None
 
 # Приветственное сообщение
-WELCOME_MESSAGE = "Добро пожаловать
+WELCOME_MESSAGE = "Добро пожаловать"
